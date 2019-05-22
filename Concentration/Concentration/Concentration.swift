@@ -21,9 +21,29 @@ class Concentration
 
     var emojis : [String]
     
-    var cards = [Card]()
+    private(set) var cards = [Card]()
     // Optional type, Good case to use, only takes care of 1 card face on
-    var indexOfOnAndOnlyFaceUpCard: Int?
+    private var indexOfOnAndOnlyFaceUpCard: Int?{
+        get {
+            var foundIndex: Int?
+            for index in cards.indices{
+                if cards[index].isFaceUP{
+                    if foundIndex == nil{
+                        foundIndex = index
+                    }
+                    else{
+                        return nil
+                    }
+                }
+            }
+            return foundIndex
+        }
+        set{
+            for index in cards.indices{
+                cards[index].isFaceUP = (index == newValue)
+            }
+        }
+    }
     var indexDict : [Int : Int] = [:]
     var score : Int
     var flipCount : Int
@@ -32,6 +52,7 @@ class Concentration
     
     func chooseCard(at index: Int)
     {
+        assert(cards.indices.contains(index), "Concentration.chooseCard(at: \(index)): chosen index not in the cards")
         if !cards[index].isMatched{
             
             flipCount += 1
@@ -93,6 +114,7 @@ class Concentration
     
     init(numberOfPairsOfCards: Int)
     {
+        assert(numberOfPairsOfCards > 0, "Concentration.init(\(numberOfPairsOfCards)): you must have at least one pair of cards")
         // _ for never used iteration objects
         for _ in 1 ... numberOfPairsOfCards{
             let card = Card()

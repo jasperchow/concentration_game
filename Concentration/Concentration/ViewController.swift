@@ -8,14 +8,36 @@
 
 import UIKit
 
+extension Int{
+    var arc4random: Int{
+        if self > 0 {
+            return Int(arc4random_uniform(UInt32(self)))
+        }
+        else if self < 0{
+            return -Int(arc4random_uniform(UInt32(abs(self))))
+        }
+        else{
+            return 0
+        }
+    }
+}
+
+
 class ViewController: UIViewController {
     
     //Initializes the game
     //Uses lazy to avoid "Cannot use instance member 'cardButtons' within property initializer; property initializers run before 'self' is available"
     //game has to be initialized
-    lazy var game = Concentration(numberOfPairsOfCards: (cardButtons.count + 1) / 2 )
+    lazy var game = Concentration(numberOfPairsOfCards: numberOfPairsOfCards )
     // didSet does not work here, move the count and view update to touch card
-    var flipCount = 0
+    var numberOfPairsOfCards: Int {
+        return (cardButtons.count + 1)/2
+    }
+    private(set) var flipCount = 0{
+        didSet{
+            flipCountLabel.text = "Flips:\(flipCount)"
+        }
+    }
     var scoreCount = 0
     var emojis : [String] = []
     var themeFlag = false
@@ -23,28 +45,27 @@ class ViewController: UIViewController {
     // Ininitialize a dictionary
     var emoji = [Int : String]()
     
-    func emoji(for card: Card) -> String
+    private func emoji(for card: Card) -> String
     {
         if emoji[card.identifier] == nil
         {
             if emojis.count > 0
             {
-                let randomIndex = Int(arc4random_uniform(UInt32(emojis.count)))
-                emoji[card.identifier] = emojis.remove(at : randomIndex)
+                emoji[card.identifier] = emojis.remove(at : emojis.count.arc4random)
             }
         }
         return emoji[card.identifier] ?? "?"
     }
     
-    @IBOutlet var backgroundColor: UIView!
+    @IBOutlet private var backgroundColor: UIView!
     
     //Rep  resents an array of cards
-    @IBOutlet var cardButtons: [UIButton]!
+    @IBOutlet private var cardButtons: [UIButton]!
     
     //Connects the flip count label in the UI to the controller
-    @IBOutlet weak var flipCountLabel: UILabel!
+    @IBOutlet private weak var flipCountLabel: UILabel!
     
-    @IBOutlet weak var scoreLabel: UILabel!
+    @IBOutlet private weak var scoreLabel: UILabel!
     //Connects the
     
     @IBAction func touchCard(_ sender: UIButton)
@@ -87,7 +108,7 @@ class ViewController: UIViewController {
         updateViewFromModel()
     }
     
-    func updateViewFromModel()
+    private func updateViewFromModel()
     {
         // Equivalent to for index in 0 ..< cardButtons.count
         // for index in CountableRange
@@ -116,4 +137,5 @@ class ViewController: UIViewController {
         }
     }
 }
+
 
